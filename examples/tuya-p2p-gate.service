@@ -1,0 +1,17 @@
+# systemd user unit: ~/.config/systemd/user/tuya-p2p-gate.service
+#   systemctl --user daemon-reload && systemctl --user enable --now tuya-p2p-gate
+#   loginctl enable-linger $USER   # keep it running without a login session
+[Unit]
+Description=Tuya P2P gate opener (HTTP API)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/tuya-p2p-gate
+ExecStart=%h/tuya-p2p-gate/.venv/bin/python %h/tuya-p2p-gate/gate_server.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,43 @@
+# Home Assistant side. Replace 192.0.2.10 with the host running gate_server.py.
+
+# secrets.yaml
+#   gate_token: "Bearer <the same token as ~/.config/tuya-p2p-gate/token>"
+
+# configuration.yaml
+rest_command:
+  gate_open:
+    url: "http://192.0.2.10:8787/open"
+    method: POST
+    headers:
+      Authorization: !secret gate_token
+    timeout: 80          # retries with cooldown can take ~50 s
+  gate_wake_video:
+    url: "http://192.0.2.10:8787/wake-video"
+    method: POST
+    headers:
+      Authorization: !secret gate_token
+
+# Live video: Settings > Devices & services > Add integration > MJPEG IP Camera
+#   MJPEG URL:      http://192.0.2.10:8787/video.mjpeg
+#   Still image URL: http://192.0.2.10:8787/snapshot.jpg
+# Call rest_command.gate_wake_video when the camera card is opened.
+
+# scripts.yaml
+open_gate:
+  alias: "Open gate"
+  icon: mdi:gate-open
+  mode: single
+  sequence:
+    - action: rest_command.gate_open
+      response_variable: resp
+    - if: "{{ resp.status == 200 }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            title: "Gate"
+            message: "Opened at {{ now().strftime('%H:%M:%S') }}"
+      else:
+        - action: persistent_notification.create
+          data:
+            title: "Gate"
+            message: "Not confirmed (HTTP {{ resp.status }}), try again"

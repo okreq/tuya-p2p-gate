@@ -1,0 +1,7 @@
+# versions tested; p2p_udp.py patches SDK internals, so keep the pin
+tuya-ipc-p2p-sdk==0.1.1
+tuya-mobile @ git+https://github.com/AboveColin/tuya-mobile@86301173
+aiohttp>=3.11
+paho-mqtt>=2.0
+# only for gate_server.py /photo
+av>=12
